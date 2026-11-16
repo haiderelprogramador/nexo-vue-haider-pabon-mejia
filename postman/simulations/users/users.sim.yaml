@@ -1,0 +1,12 @@
+# Simulación "users": sirve el mock user-service en un solo puerto.
+# Con enrutamiento por path, http://127.0.0.1:4010/user-service/api/users
+# llega al mock como /api/users. Ese prefijo no existe en la API real.
+#
+#   postman simulation run postman/simulations/users/users.sim.yaml --port 4010 --no-history
+
+simulation: users
+routing: path
+mocks:
+  - name: user-service
+    routeKey: user-service
+    path: postman/mocks/user-service

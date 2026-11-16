@@ -1,0 +1,13 @@
+version: 1
+name: user-service
+slug: user-service
+description: Simulación local del servicio de usuarios que consume Nexo (login y CRUD con estado).
+protocol: http
+port: 4010
+origin: https://users-management-api-orb0.onrender.com
+interceptRequests: true
+mockSrc: default.js
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

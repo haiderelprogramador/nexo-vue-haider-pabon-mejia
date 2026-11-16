@@ -1,0 +1,57 @@
+# Contexto de la simulación "users".
+# Deja evidencia de en qué se apoya cada supuesto. No se importa en Vue ni
+# decide ninguna respuesta: es documentación verificable.
+
+simulation: "users"
+generated: "2026-11-14"
+
+purpose:
+  stands_in_for: Servicio de usuarios (user-service) que consume el frontend Nexo, bajo /api.
+  unblocks: Recorrer login, CRUD, 401/403 y registro pendiente sin levantar el backend Java ni su base de datos.
+
+assumptions:
+  - id: login-solo-cuentas-activas
+    status: supported
+    claim: POST /api/auth/login solo autentica cuentas con estado ACTIVE; las demás reciben 401.
+    reason: Así lo describen las guías del tutorial (capítulos 09 y 12). No se leyó el código del backend.
+    verification: Escenario E2E "una cuenta registrada queda pendiente y no puede iniciar sesión" contra el mock.
+    source: tests/e2e/users.spec.ts; postman/mocks/user-service/default.js
+    updated_at: "2026-11-14"
+
+  - id: creacion-publica-queda-pendiente
+    status: supported
+    claim: POST /api/users es público, responde 201 y deja la cuenta en PENDING; el mismo ID con los mismos datos responde 200 y con datos distintos 409.
+    reason: Descrito en las guías (capítulos 05, 12 y 13) y modelado igual en el mock.
+    verification: Escenarios E2E de CRUD y de registro contra el mock.
+    source: tests/e2e/users.spec.ts; postman/mocks/user-service/default.js
+    updated_at: "2026-11-14"
+
+  - id: permisos-por-rol
+    status: supported
+    claim: Listar y consultar exige ADMIN o REVIEWER; actualizar y eliminar exige ADMIN; lo demás responde 403.
+    reason: Descrito en las guías (capítulos 09 y 10). Solo se comprobó el camino ADMIN en navegador.
+    verification: Escenario E2E de CRUD con la cuenta ADMIN; 403 forzado con el control __failure.
+    source: tests/e2e/users.spec.ts
+    updated_at: "2026-11-14"
+
+  - id: token-con-claims-sub-role-exp
+    status: supported
+    claim: El accessToken es un JWT cuyo payload trae sub, role y exp (segundos), con tokenType Bearer.
+    reason: Es lo que decodifica UserHttpAdapter según la guía 06. El mock no firma el token.
+    verification: Login E2E correcto contra el mock; 8 pruebas unitarias en verde.
+    source: src/adapters/http/UserHttpAdapter.ts; tests/unit/application.test.ts
+    updated_at: "2026-11-14"
+
+  - id: despliegue-real
+    status: unknown
+    claim: El backend real (local en :8080 o el remoto de .env.example) se comporta igual que esta simulación.
+    reason: No se ejecutó ninguna petición contra un backend auténtico.
+    verification: Pendiente. Requiere el servicio Java levantado y una cuenta ADMIN activa.
+    source: null
+    updated_at: "2026-11-14"
+
+fingerprints:
+  - id: reconstruccion-inicial
+    date: "2026-11-14"
+    commit: null
+    cli: "1.90.0"
